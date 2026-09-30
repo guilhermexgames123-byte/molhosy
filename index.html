@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL = "https://qjwhvnvkqbnmmdweegof.supabase.co";
+
+const SUPABASE_KEY = "sb_publishable_fP3CljeAxwkNq5Zuf1qbbQ_w0hpcGqt";
+
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+</script>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SISTEMA // DAILY LEVELING</title>
+<style>
+:root{
+  --bg:#030711; --panel:#09111f; --panel2:#0d1728; --line:#1b2a42;
+  --blue:#24a9ff; --cyan:#63d7ff; --gold:#f5c928; --red:#ff294f;
+  --green:#38f29a; --text:#edf5ff; --muted:#8b9bb3;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:radial-gradient(circle at 50% -10%,#10233e 0,#050b15 42%,#02050a 100%);color:var(--text);font-family:Arial,Helvetica,sans-serif;min-height:100%}
+body{padding-bottom:78px}
+button{font:inherit;color:inherit}
+.app{max-width:720px;margin:auto;min-height:100vh}
+.top{position:sticky;top:0;z-index:10;background:rgba(3,7,17,.92);backdrop-filter:blur(12px);border-bottom:1px solid #15233a;padding:13px 16px 12px}
+.toprow{display:flex;align-items:center;justify-content:space-between}
+.level{font-size:22px;font-weight:900;letter-spacing:.5px}
+.level span{color:var(--blue)}
+.coins{border:1px solid #66551b;background:#17170d;color:var(--gold);padding:8px 13px;border-radius:12px;font-weight:900}
+.xpwrap{margin-top:9px;height:7px;background:#172235;border-radius:9px;overflow:hidden}
+.xpbar{height:100%;width:0;background:linear-gradient(90deg,#1489ff,#67dcff);box-shadow:0 0 12px #1489ff}
+.xptxt{display:flex;justify-content:space-between;margin-top:5px;font-size:11px;color:var(--muted)}
+.hero{padding:25px 16px 8px}
+.eyebrow{font-size:11px;color:var(--cyan);letter-spacing:3px;font-weight:900}
+h1{margin:5px 0 2px;font-size:30px;letter-spacing:1px}
+.sub{color:var(--muted);font-size:13px}
+.notice{margin-top:16px;border:1px solid #25476c;background:linear-gradient(135deg,#0b1a2d,#07101d);padding:14px;border-radius:14px;display:flex;gap:12px;align-items:center}
+.notice b{color:var(--gold);font-size:12px;letter-spacing:1px}
+.notice small{display:block;color:var(--muted);margin-top:4px}
+.section{padding:13px 16px}
+.sectionhead{display:flex;justify-content:space-between;align-items:end;margin-bottom:10px}
+.sectionhead h2{font-size:14px;letter-spacing:2px;margin:0}
+.timer{color:var(--gold);font-weight:800;font-size:12px}
+.card{position:relative;overflow:hidden;background:linear-gradient(145deg,#0d1727,#070e1b);border:1px solid #26354e;border-radius:18px;padding:16px;margin:11px 0;box-shadow:0 8px 30px rgba(0,0,0,.2)}
+.card:before{content:"";position:absolute;inset:0;pointer-events:none;border-left:3px solid var(--accent)}
+.card.done{opacity:.55;border-color:#244e43}
+.card.done:after{content:"CONCLUÍDA";position:absolute;right:13px;top:13px;color:var(--green);font-size:10px;font-weight:900;letter-spacing:1px}
+.cardtop{display:flex;gap:13px;align-items:center}
+.icon{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;background:#050a12;border:1px solid #24334b;font-size:25px;flex:0 0 auto}
+.info{flex:1}
+.name{font-size:17px;font-weight:900;letter-spacing:.3px}
+.desc{font-size:12px;color:#a9b5c7;line-height:1.45;margin-top:5px}
+.meta{display:flex;align-items:center;justify-content:space-between;margin-top:14px}
+.tag{font-size:10px;border:1px solid #3b4860;border-radius:6px;padding:5px 7px;color:#cbd5e4}
+.xp{color:var(--gold);font-weight:900;font-size:14px}
+.check{width:31px;height:31px;border:2px solid #46546d;border-radius:9px;background:#07101d;display:grid;place-items:center;cursor:pointer;font-weight:900}
+.check:hover{border-color:var(--blue)}
+.done .check{background:#0b3a2a;border-color:var(--green);color:var(--green)}
+.progress{height:5px;background:#172235;border-radius:5px;margin-top:13px;overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:var(--accent)}
+.secret{border:1px solid #6e5b17;background:linear-gradient(135deg,#17170d,#0c1018);cursor:pointer}
+.secret .name{color:var(--gold)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.stat{background:#08111f;border:1px solid #1b2b43;border-radius:14px;padding:13px;text-align:center}
+.stat b{display:block;font-size:20px;color:var(--cyan)}
+.stat span{font-size:10px;color:var(--muted);letter-spacing:1px}
+.quote{border:1px solid #202e44;background:#070e18;border-radius:15px;padding:15px;text-align:center;color:#b7c5d8;font-size:12px;font-style:italic}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.action{border:1px solid #26364e;background:#0b1524;padding:12px;border-radius:12px;cursor:pointer;font-weight:800}
+.action:hover{border-color:var(--blue)}
+.bottom{position:fixed;z-index:20;bottom:0;left:0;right:0;background:rgba(3,7,17,.96);border-top:1px solid #18273d;padding:9px max(12px,calc((100vw - 720px)/2 + 12px));display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.nav{background:transparent;border:0;color:#65758e;font-size:10px;padding:7px;cursor:pointer}
+.nav.active{color:var(--blue)}
+.toast{position:fixed;left:50%;bottom:85px;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;background:#0d1b2d;border:1px solid #2d6ca0;border-radius:12px;padding:11px 16px;font-size:12px;transition:.25s;z-index:50;box-shadow:0 10px 30px #000}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:40;display:none;align-items:center;justify-content:center;padding:22px}
+.modal{max-width:420px;width:100%;background:#08111e;border:1px solid #31557b;border-radius:18px;padding:22px;box-shadow:0 0 60px rgba(28,143,255,.18)}
+.modal h3{margin:0;color:var(--gold)}
+.modal p{color:#b5c2d3;line-height:1.6}
+.modal button{width:100%;border:1px solid #31557b;background:#0d1c30;border-radius:10px;padding:12px;cursor:pointer}
+@media(max-width:430px){h1{font-size:27px}.card{padding:14px}.name{font-size:15px}}
+
+.character{display:flex;gap:14px;align-items:center;background:linear-gradient(135deg,#0a1525,#07101b);border:1px solid #29415f;border-radius:16px;padding:15px}
+.avatar{width:64px;height:64px;border-radius:14px;display:grid;place-items:center;font-size:31px;background:#06101b;border:1px solid #2a5a84;box-shadow:0 0 24px rgba(36,169,255,.13)}
+.charinfo{flex:1}.charname{font-size:18px;font-weight:900}.rank{font-size:10px;color:#8294ad;letter-spacing:1.5px;margin:4px 0 8px}.rank b{color:var(--gold)}
+.mini-progress{height:5px;background:#172235;border-radius:5px;overflow:hidden}.mini-progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,#1489ff,#67dcff)}
+.attributes{margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px}.attr{position:relative;padding:10px 11px;background:#07101b;border:1px solid #1c2d45;border-radius:11px}.attr span{font-size:9px;color:#8495ac;letter-spacing:1px}.attr b{float:right;color:var(--cyan);font-size:15px}.attr i{display:block;height:3px;background:#16263b;border-radius:3px;margin-top:7px}.attr i:after{content:"";display:block;height:100%;width:40%;background:var(--blue);border-radius:3px}
+.achievements{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.achievement{background:#08111e;border:1px solid #1d2d45;border-radius:13px;padding:12px}.achievement.locked{opacity:.42}.achievement b{display:block;font-size:11px;margin-bottom:5px}.achievement span{font-size:9px;color:#8595aa;line-height:1.4}.achievement em{display:block;margin-top:7px;color:var(--gold);font-style:normal;font-size:9px;font-weight:900}
+.boss{border:1px solid #7a202f;background:linear-gradient(135deg,#180a10,#0b101b);border-radius:17px;padding:16px;box-shadow:0 0 25px rgba(255,41,79,.08)}.bosshead{display:flex;justify-content:space-between;align-items:center}.bossname{font-size:17px;font-weight:900;color:#ff6b83}.bossxp{color:var(--gold);font-weight:900}.bosstext{font-size:11px;color:#a9b5c6;margin:7px 0 12px;line-height:1.5}.bossbar{height:8px;background:#26121a;border-radius:8px;overflow:hidden}.bossbar i{display:block;height:100%;background:var(--red);width:0}.boss button,.buy{margin-top:12px;width:100%;padding:10px;border-radius:9px;border:1px solid #7a3040;background:#1a0d13;cursor:pointer;font-weight:900}
+.shop{display:grid;grid-template-columns:1fr 1fr;gap:9px}.item{background:#08111e;border:1px solid #26364d;border-radius:13px;padding:12px}.item b{display:block;font-size:12px}.item span{display:block;color:#8495aa;font-size:9px;line-height:1.4;margin:5px 0}.price{color:var(--gold);font-weight:900;font-size:11px}
+</style>
+</head>
+<script>
+async function signUp() {
+    const username = document.getElementById("authUsername").value.trim();
+    const email = document.getElementById("authEmail").value.trim();
+    const password = document.getElementById("authPassword").value;
+
+    const message = document.getElementById("authMessage");
+
+    if (!username || !email || !password) {
+        message.textContent = "Preencha todos os campos.";
+        message.style.color = "#ff294f";
+        return;
+    }
+
+    if (password.length < 6) {
+        message.textContent = "A senha precisa ter pelo menos 6 caracteres.";
+        message.style.color = "#ff294f";
+        return;
+    }
+
+    message.textContent = "Criando conta...";
+    message.style.color = "#24a9ff";
+
+    const { data, error } = await supabaseClient.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+            data: {
+                username: username,
+                display_name: username
+            }
+        }
+    });
+
+    if (error) {
+        console.error(error);
+        message.textContent = error.message;
+        message.style.color = "#ff294f";
+        return;
+    }
+
+    message.textContent = "Conta criada! Entrando...";
+    message.style.color = "#24ff88";
+
+    if (data.session) {
+        await startGame();
+    } else {
+        message.textContent =
+            "Conta criada! Verifique seu e-mail para confirmar.";
+    }
+}
+
+
+async function signIn() {
+    const email = document.getElementById("authEmail").value.trim();
+    const password = document.getElementById("authPassword").value;
+
+    const message = document.getElementById("authMessage");
+
+    if (!email || !password) {
+        message.textContent = "Digite seu e-mail e senha.";
+        message.style.color = "#ff294f";
+        return;
+    }
+
+    message.textContent = "Entrando...";
+    message.style.color = "#24a9ff";
+
+    const { data, error } =
+        await supabaseClient.auth.signInWithPassword({
+            email: email,
+            password: password
+        });
+
+    if (error) {
+        console.error(error);
+        message.textContent = "E-mail ou senha incorretos.";
+        message.style.color = "#ff294f";
+        return;
+    }
+
+    await startGame();
+}
+
+
+async function startGame() {
+    const {
+        data: { session }
+    } = await supabaseClient.auth.getSession();
+
+    if (!session) {
+        return;
+    }
+
+    document.getElementById("authScreen").style.display = "none";
+
+    console.log("LOGIN OK:", session.user.email);
+
+    await carregarPerfil();
+}
+
+
+async function carregarPerfil() {
+    const {
+        data: { user }
+    } = await supabaseClient.auth.getUser();
+
+    if (!user) {
+        return;
+    }
+
+    const { data: profile, error } =
+        await supabaseClient
+            .from("profiles")
+            .select("*")
+            .eq("id", user.id)
+            .single();
+
+    if (error) {
+        console.error("Erro ao carregar perfil:", error);
+        return;
+    }
+
+    console.log("PERFIL CARREGADO:", profile);
+}
+
+
+async function logout() {
+    await supabaseClient.auth.signOut();
+
+    location.reload();
+}
+
+
+supabaseClient.auth.onAuthStateChange(
+    async (event, session) => {
+
+        if (session) {
+            document.getElementById("authScreen").style.display = "none";
+
+            if (event === "SIGNED_IN") {
+                await carregarPerfil();
+            }
+
+        } else {
+            document.getElementById("authScreen").style.display = "flex";
+        }
+    }
+);
+
+
+window.addEventListener("load", async () => {
+
+    const {
+        data: { session }
+    } = await supabaseClient.auth.getSession();
+
+    if (session) {
+        await startGame();
+    }
+
+});
+</script>
+<body>
+<div id="authScreen" style="
+    position:fixed;
+    inset:0;
+    z-index:9999;
+    background:#030711;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+">
+    <div style="
+        width:100%;
+        max-width:420px;
+        background:#09111f;
+        border:1px solid #1b2a42;
+        border-radius:18px;
+        padding:28px;
+        box-shadow:0 0 40px rgba(36,169,255,.12);
+    ">
+        <div style="
+            text-align:center;
+            font-size:30px;
+            font-weight:900;
+            letter-spacing:2px;
+            color:#24a9ff;
+            margin-bottom:8px;
+        ">
+            DAILY LEVELING
+        </div>
+
+        <div style="
+            text-align:center;
+            color:#7f91aa;
+            font-size:13px;
+            margin-bottom:25px;
+        ">
+            SISTEMA DE EVOLUÇÃO
+        </div>
+
+        <input
+            id="authUsername"
+            type="text"
+            placeholder="Nome do jogador"
+            style="
+                width:100%;
+                box-sizing:border-box;
+                padding:14px;
+                margin-bottom:10px;
+                background:#0d1728;
+                border:1px solid #1b2a42;
+                border-radius:10px;
+                color:white;
+                outline:none;
+            "
+        >
+
+        <input
+            id="authEmail"
+            type="email"
+            placeholder="E-mail"
+            style="
+                width:100%;
+                box-sizing:border-box;
+                padding:14px;
+                margin-bottom:10px;
+                background:#0d1728;
+                border:1px solid #1b2a42;
+                border-radius:10px;
+                color:white;
+                outline:none;
+            "
+        >
+
+        <input
+            id="authPassword"
+            type="password"
+            placeholder="Senha"
+            style="
+                width:100%;
+                box-sizing:border-box;
+                padding:14px;
+                margin-bottom:14px;
+                background:#0d1728;
+                border:1px solid #1b2a42;
+                border-radius:10px;
+                color:white;
+                outline:none;
+            "
+        >
+
+        <button
+            onclick="signUp()"
+            style="
+                width:100%;
+                padding:14px;
+                border:0;
+                border-radius:10px;
+                background:#24a9ff;
+                color:#030711;
+                font-weight:900;
+                cursor:pointer;
+                margin-bottom:9px;
+            "
+        >
+            CRIAR CONTA
+        </button>
+
+        <button
+            onclick="signIn()"
+            style="
+                width:100%;
+                padding:14px;
+                border:1px solid #24a9ff;
+                border-radius:10px;
+                background:transparent;
+                color:#24a9ff;
+                font-weight:900;
+                cursor:pointer;
+            "
+        >
+            ENTRAR
+        </button>
+
+        <div
+            id="authMessage"
+            style="
+                text-align:center;
+                margin-top:15px;
+                font-size:13px;
+                color:#7f91aa;
+                min-height:18px;
+            "
+        ></div>
+    </div>
+</div>
+<div class="app">
+  <header class="top">
+    <div class="toprow">
+      <div class="level">NÍVEL <span id="level">1</span></div>
+      <div class="coins">◉ <span id="coins">0</span></div>
+    </div>
+    <div class="xpwrap"><div class="xpbar" id="xpbar"></div></div>
+    <div class="xptxt"><span id="xptext">0 / 100 XP</span><span id="streak">🔥 0 dias</span></div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="eyebrow">SISTEMA DE EVOLUÇÃO PESSOAL</div>
+      <h1>MISSÕES DO DIA</h1>
+      <div class="sub">Construa seu personagem. Um dia de cada vez.</div>
+      <div class="notice">
+        <div style="font-size:24px">⚡</div>
+        <div><b>PROTOCOLO ATIVO</b><small>Complete missões para ganhar XP, subir de nível e manter sua sequência.</small></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="sectionhead">
+        <h2>MISSÃO SECRETA</h2><span class="timer" id="countdown">--:--:--</span>
+      </div>
+      <div class="card secret" id="secret" style="--accent:#f5c928">
+        <div class="cardtop">
+          <div class="icon">?</div><div class="info">
+            <div class="name" id="secretName">ENCONTRAR UMA MISSÃO SECRETA</div>
+            <div class="desc" id="secretDesc">Toque para gerar uma missão aleatória.</div>
+          </div>
+          <div class="xp">+<span id="secretXp">50</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="sectionhead"><h2>FORÇA</h2><span class="timer">FÍSICO</span></div>
+      <div id="physical"></div>
+    </section>
+
+    <section class="section">
+      <div class="sectionhead"><h2>MENTE & DISCIPLINA</h2><span class="timer">MENTAL</span></div>
+      <div id="mental"></div>
+    </section>
+
+    <section class="section">
+      <div class="sectionhead"><h2>STATUS DO JOGADOR</h2></div>
+      <div class="stats">
+        <div class="stat"><b id="completed">0</b><span>MISSÕES</span></div>
+        <div class="stat"><b id="totalxp">0</b><span>XP TOTAL</span></div>
+        <div class="stat"><b id="beststreak">0</b><span>SEQUÊNCIA</span></div>
+      </div>
+    </section>
+
+    <section class="section" id="statusPanel">
+      <div class="sectionhead"><h2>STATUS DO JOGADOR</h2><span class="timer">RANK E</span></div>
+      <div class="character">
+        <div class="avatar">⚔</div>
+        <div class="charinfo">
+          <div class="charname">JOGADOR</div>
+          <div class="rank">RANK <b id="rank">E</b> · NÍVEL <b id="level2">1</b></div>
+          <div class="mini-progress"><i id="levelbar2"></i></div>
+        </div>
+      </div>
+      <div class="attributes">
+        <div class="attr"><span>FORÇA</span><b id="str">0</b><i></i></div>
+        <div class="attr"><span>VITALIDADE</span><b id="vit">0</b><i></i></div>
+        <div class="attr"><span>AGILIDADE</span><b id="agi">0</b><i></i></div>
+        <div class="attr"><span>INTELIGÊNCIA</span><b id="int">0</b><i></i></div>
+        <div class="attr"><span>DISCIPLINA</span><b id="dis">0</b><i></i></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="sectionhead"><h2>CONQUISTAS</h2><span class="timer" id="achievementCount">0 / 6</span></div>
+      <div class="achievements" id="achievements"></div>
+    </section>
+
+    <section class="section">
+      <div class="sectionhead"><h2>BOSS DA SEMANA</h2><span class="timer" id="bossTimer">DOMINGO</span></div>
+      <div class="boss" id="boss"></div>
+    </section>
+
+    <section class="section">
+      <div class="sectionhead"><h2>LOJA DO SISTEMA</h2><span class="timer">MOEDAS: <b id="shopCoins">0</b></span></div>
+      <div class="shop" id="shop"></div>
+    </section>
+
+    <section class="section">
+      <div class="quote" id="quote">“Você não precisa estar motivado. Precisa apenas cumprir a próxima missão.”</div>
+    </section>
+
+    <section class="section">
+      <div class="actions">
+        <button class="action" onclick="resetToday()">↻ RESETAR DIA</button>
+        <button class="action" onclick="openStats()">◈ COMO FUNCIONA</button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<nav class="bottom">
+  <button class="nav active" onclick="go('physical')">⚡<br>MISSÕES</button>
+  <button class="nav" onclick="go('statusPanel')">♜<br>STATUS</button>
+  <button class="nav" onclick="go('achievements')">🏆<br>CONQUISTAS</button>
+  <button class="nav" onclick="go('shop')">◉<br>LOJA</button>
+</nav>
+
+<div class="toast" id="toast"></div>
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h3>STATUS DO SISTEMA</h3>
+    <p>As missões são salvas automaticamente neste aparelho. Cada missão concluída dá XP e moedas. A cada 100 XP você sobe um nível. O dia reinicia automaticamente à meia-noite.</p>
+    <button onclick="closeModal()">ENTENDIDO</button>
+  </div>
+</div>
+
+<script>
+const missions=[
+ let missions = [];
+let dailyMissions = [];
+const secrets=[
+ ['20 FLEXÕES','Faça 20 flexões, em séries se necessário.',30],
+ ['CAMINHADA DO SISTEMA','Caminhe por 15 minutos sem usar o celular.',25],
+ ['GELO MENTAL','Tome um banho e termine os últimos 20 segundos com água fria.',35],
+ ['ORDEM ABSOLUTA','Arrume seu quarto ou mesa por 10 minutos.',25],
+ ['BOSS FIGHT','Faça 3 séries de 30s de prancha, descansando 30s.',50],
+ ['SILÊNCIO','Passe 10 minutos em silêncio, sem tela, apenas observando a respiração.',30]
+];
+const quotes=[
+'“A disciplina transforma pequenas ações em grandes mudanças.”',
+'“Você não precisa vencer o dia inteiro. Vença a próxima missão.”',
+'“O personagem que você quer ser é construído pelas ações que ninguém vê.”',
+'“Consistência é fazer de novo quando a novidade acabou.”',
+'“Comece pequeno. Termine o que começou.”'
+];
+let state=JSON.parse(localStorage.getItem('dailyLeveling')||'null')||{date:'',done:[],totalXP:0,coins:0,streak:0,best:0,secret:null,secretDone:false,bossDefeated:false}; if(state.bossDefeated===undefined)state.bossDefeated=false;
+const today=()=>new Date().toISOString().slice(0,10);
+function ensureDay(){
+ if(state.date!==today()){
+   if(state.date){ state.streak = state.done.length ? state.streak+1 : 0; state.best=Math.max(state.best,state.streak); }
+   state.date=today(); state.done=[]; state.secret=null; state.secretDone=false;
+   save();
+ }
+}
+function save(){localStorage.setItem('dailyLeveling',JSON.stringify(state));}
+function render(){
+ ensureDay();
+ ['physical','mental'].forEach(cat=>{
+  document.getElementById(cat).innerHTML=missions.filter(m=>m.cat===cat).map(m=>{
+   const done=state.done.includes(m.id);
+   return `<div class="card ${done?'done':''}" style="--accent:${m.accent}">
+    <div class="cardtop"><div class="icon">${m.icon}</div><div class="info">
+      <div class="name">${m.name}</div><div class="desc">${m.desc}</div>
+    </div><button class="check" onclick="toggle('${m.id}')">${done?'✓':''}</button></div>
+    <div class="progress"><i style="width:${done?'100':'0'}%"></i></div>
+    <div class="meta"><span class="tag">[${m.cat==='physical'?'FORÇA':'MENTE'}] &nbsp; [DIÁRIA]</span><span class="xp">${m.xp} XP</span></div>
+   </div>`;
+  }).join('');
+ });
+ const xp=state.done.reduce((s,id)=>s+(missions.find(m=>m.id===id)?.xp||0),0)+(state.secretDone?(state.secret?.[2]||0):0);
+ const level=Math.floor(xp/100)+1, inLevel=xp%100;
+ document.getElementById('level').textContent=level;
+ document.getElementById('xptext').textContent=`${inLevel} / 100 XP`;
+ document.getElementById('xpbar').style.width=inLevel+'%';
+ document.getElementById('coins').textContent=state.coins;
+ document.getElementById('completed').textContent=state.done.length+(state.secretDone?1:0);
+ document.getElementById('totalxp').textContent=xp;
+ document.getElementById('streak').textContent=`🔥 ${state.streak} dias`;
+ document.getElementById('beststreak').textContent=state.best;
+ if(state.secret){document.getElementById('secretName').textContent=state.secret[0];document.getElementById('secretDesc').textContent=state.secret[1];document.getElementById('secretXp').textContent=state.secret[2];}
+}
+function toggle(id){
+ if(state.done.includes(id)) return;
+ const m=missions.find(x=>x.id===id); state.done.push(id); state.coins+=Math.max(1,Math.floor(m.xp/5)); save(); render();
+ toast('MISSÃO CONCLUÍDA  +'+m.xp+' XP');
+}
+function secret(){
+ if(state.secretDone){toast('MISSÃO SECRETA JÁ CONCLUÍDA');return}
+ if(!state.secret){state.secret=secrets[Math.floor(Math.random()*secrets.length)];save();render();toast('MISSÃO SECRETA DESCOBERTA');}
+ else {state.secretDone=true;state.coins+=Math.floor(state.secret[2]/5);save();render();toast('MISSÃO SECRETA CONCLUÍDA  +'+state.secret[2]+' XP');}
+}
+document.getElementById('secret').onclick=secret;
+function resetToday(){
+ if(confirm('Resetar apenas as missões de hoje? Seu XP histórico será preservado.')){
+   state.done=[];state.secret=null;state.secretDone=false;save();render();toast('DIA RESETADO');
+ }
+}
+function openStats(){document.getElementById('overlay').style.display='flex'}
+function closeModal(){document.getElementById('overlay').style.display='none'}
+function toast(t){const el=document.getElementById('toast');el.textContent=t;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200)}
+function newQuote(){document.getElementById('quote').textContent=quotes[Math.floor(Math.random()*quotes.length)];toast('NOVA MENSAGEM DO SISTEMA')}
+function countdown(){
+ const now=new Date(), next=new Date(now);next.setHours(24,0,0,0);
+ let s=Math.max(0,Math.floor((next-now)/1000)),h=Math.floor(s/3600);s%=3600;let m=Math.floor(s/60);s%=60;
+ document.getElementById('countdown').textContent=[h,m,s].map(x=>String(x).padStart(2,'0')).join(':');
+}
+ensureDay();render();countdown();setInterval(countdown,1000);
+
+const bossData={
+ name:'BOSS: 100 REPETIÇÕES',
+ desc:'Complete 100 repetições combinando flexões, agachamentos e abdominais durante a semana.',
+ xp:100
+};
+const achievementData=[
+ {id:'first',icon:'⚡',name:'DESPERTAR',desc:'Complete sua primeira missão.',xp:20},
+ {id:'five',icon:'🔥',name:'EM RITMO',desc:'Complete 5 missões.',xp:30},
+ {id:'ten',icon:'⚔️',name:'CAÇADOR',desc:'Complete 10 missões.',xp:50},
+ {id:'level5',icon:'👑',name:'ASCENSÃO',desc:'Alcance o nível 5.',xp:75},
+ {id:'boss',icon:'☠️',name:'BOSS SLAYER',desc:'Derrote um Boss semanal.',xp:100},
+ {id:'streak7',icon:'🌟',name:'DISCIPLINA',desc:'Mantenha 7 dias de sequência.',xp:80}
+];
+const shopData=[
+ {id:'rest',name:'DESCANSO DE ELITE',desc:'Recompensa simbólica: vale para um dia sem missão física.',cost:80},
+ {id:'movie',name:'NOITE DE RECOMPENSA',desc:'Escolha um filme/série sem culpa.',cost:120},
+ {id:'meal',name:'REFEIÇÃO ESPECIAL',desc:'Reserve moedas para uma refeição que você curta.',cost:180},
+ {id:'custom',name:'RECOMPENSA LIVRE',desc:'Defina sua própria recompensa fora do sistema.',cost:250}
+];
+function xpNow(){
+ return state.done.reduce((s,id)=>s+(missions.find(m=>m.id===id)?.xp||0),0)+(state.secretDone?(state.secret?.[2]||0):0);
+}
+function renderExtended(){
+ const xp=xpNow(), level=Math.floor(xp/100)+1;
+ document.getElementById('level2').textContent=level;
+ document.getElementById('levelbar2').style.width=(xp%100)+'%';
+ document.getElementById('rank').textContent=level>=20?'S':level>=15?'A':level>=10?'B':level>=5?'C':level>=3?'D':'E';
+ const physical=state.done.filter(id=>['push','squat','abs','plank','lunge','stretch'].includes(id)).length;
+ const mental=state.done.filter(id=>['breath','noPhone','water','read','plan','gratitude'].includes(id)).length;
+ const vals={str:physical*3,vit:Math.floor(physical*2.2),agi:Math.floor(physical*1.5),int:mental*3,dis:state.done.length*2+state.streak*2};
+ Object.entries(vals).forEach(([k,v])=>document.getElementById(k).textContent=v);
+ document.getElementById('shopCoins').textContent=state.coins;
+ renderAchievements(xp,level);
+ renderBoss();
+ renderShop();
+}
+function renderAchievements(xp,level){
+ const completed=state.done.length+(state.secretDone?1:0);
+ const checks={
+  first:completed>=1,five:completed>=5,ten:completed>=10,level5:level>=5,boss:!!state.bossDefeated,streak7:state.best>=7
+ };
+ let count=Object.values(checks).filter(Boolean).length;
+ document.getElementById('achievementCount').textContent=count+' / 6';
+ document.getElementById('achievements').innerHTML=achievementData.map(a=>{
+  const ok=checks[a.id];
+  return `<div class="achievement ${ok?'':'locked'}"><b>${a.icon} ${a.name}</b><span>${a.desc}</span><em>${ok?'✓ DESBLOQUEADA':'+'+a.xp+' XP'}</em></div>`;
+ }).join('');
+}
+function renderBoss(){
+ const progress=Math.min(100,Math.round(state.done.length/10*100));
+ document.getElementById('boss').innerHTML=`<div class="bosshead"><div class="bossname">☠ ${bossData.name}</div><div class="bossxp">+${bossData.xp} XP</div></div>
+ <div class="bosstext">${bossData.desc}<br><b>Progresso: ${Math.min(state.done.length,10)} / 10 missões concluídas</b></div>
+ <div class="bossbar"><i style="width:${progress}%"></i></div>
+ <button onclick="claimBoss()">${state.bossDefeated?'✓ BOSS DERROTADO':'DERROTAR BOSS'}</button>`;
+}
+function claimBoss(){
+ if(state.bossDefeated){toast('BOSS JÁ DERROTADO');return}
+ if(state.done.length<10){toast('BOSS AINDA NÃO ESTÁ DERROTADO');return}
+ state.bossDefeated=true;state.coins+=20;save();render();renderExtended();toast('BOSS DERROTADO  +100 XP');
+}
+function renderShop(){
+ document.getElementById('shop').innerHTML=shopData.map(i=>`<div class="item"><b>${i.name}</b><span>${i.desc}</span><div class="price">◉ ${i.cost}</div><button class="buy" onclick="buy('${i.id}')">RESGATAR</button></div>`).join('');
+}
+function buy(id){
+ const i=shopData.find(x=>x.id===id);
+ if(state.coins<i.cost){toast('MOEDAS INSUFICIENTES');return}
+ state.coins-=i.cost;save();render();renderExtended();toast('RECOMPENSA RESGATADA: '+i.name);
+}
+function go(id){document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'})}
+const oldRender=render;
+render=function(){oldRender();renderExtended()};
+render();
+</script>
+</body>
+</html>
